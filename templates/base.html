@@ -1,0 +1,43 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>AnalogVibe</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="page">
+
+    <header class="topbar">
+        <a class="logo" href="{% url 'cameras:home' %}">AnalogVibe</a>
+
+        <nav class="nav">
+            <a href="{% url 'cameras:home' %}">Главная</a>
+            <a href="{% url 'cameras:camera_list' %}">Камеры</a>
+            <a href="{% url 'presets:preset_list' %}">Пресеты</a>
+            <a href="{% url 'exhibitions:exhibition_list' %}">Выставки</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+    <div>
+        <h3>AnalogVibe</h3>
+        <p>Пленочная эстетика, старые камеры и шумные фотоархивы.</p>
+    </div>
+
+    <div class="footer-note">
+        <p>Film mood</p>
+        <p>Vintage cameras · Presets · Exhibitions</p>
+    </div>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-text-block">
+        <p class="hero-label">Analog photo community</p>
+
+        <h1 class="hero-title">
+            ANALOG
+            <span class="hero-title-second">VIBE</span>
+        </h1>
+    </div>
+
+    <div class="hero-collage">
+        <div class="collage-photo photo-large">
+            <img src="{% static 'img/hero-camera.jpg' %}" alt="Старая камера">
+        </div>
+
+        <div class="collage-photo">
+            <img src="{% static 'img/preset-film.jpg' %}" alt="Пленка">
+        </div>
+
+        <div class="collage-photo">
+            <img src="{% static 'img/hero-girl.jpg' %}" alt="Винтажное фото">
+        </div>
+
+        <div class="collage-photo">
+            <img src="{% static 'img/exhibition.jpg' %}" alt="Фотоархив">
+        </div>
+
+        <div class="collage-photo">
+            <img src="{% static 'img/hero-extra.jpg' %}" alt="Винтажный кадр">
+        </div>
+    </div>
+</section>
+
+<section class="about-us">
+    <div class="about-header">
+        <span>About us</span>
+        <h2>Пленочная эстетика, старые камеры и шумные фотоархивы</h2>
+    </div>
+
+    <div class="about-content">
+        <p>
+            AnalogVibe собирает в одном пространстве атмосферу старых фотоальбомов:
+            камеры с историей, теплые пленочные оттенки, зерно, мягкий свет
+            и виртуальные выставки фотографий.
+        </p>
+    </div>
+</section>
+
+<section class="project-sections">
+    <div class="section-kicker">
+        <span>Основные разделы</span>
+    </div>
+
+    <a class="feature-row feature-dark" href="{% url 'cameras:camera_list' %}">
+        <div class="feature-image">
+            <img src="{% static 'img/hero-camera.jpg' %}" alt="Винтажная камера">
+        </div>
+
+        <div class="feature-text">
+            <p class="feature-number">01 · Cameras</p>
+            <h2>Камеры</h2>
+            <p>
+                Каталог старых камер с брендом, годом выпуска, состоянием
+                и редкостью модели. Это основа проекта AnalogVibe.
+            </p>
+            <span class="feature-link">Смотреть каталог →</span>
+        </div>
+    </a>
+
+    <a class="feature-row feature-row-reverse" href="{% url 'presets:preset_list' %}">
+        <div class="feature-image">
+            <img src="{% static 'img/preset-film.jpg' %}" alt="Пленочный пресет">
+        </div>
+
+        <div class="feature-text">
+            <p class="feature-number">02 · Presets</p>
+            <h2>Пресеты</h2>
+            <p>
+                Пленочные обработки для теплых кадров, мягких теней,
+                выцветших цветов и зернистой картинки.
+            </p>
+            <span class="feature-link">Открыть пресеты →</span>
+        </div>
+    </a>
+
+    <a class="feature-row feature-dark" href="{% url 'exhibitions:exhibition_list' %}">
+        <div class="feature-image">
+            <img src="{% static 'img/exhibition.jpg' %}" alt="Виртуальная выставка">
+        </div>
+
+        <div class="feature-text">
+            <p class="feature-number">03 · Exhibitions</p>
+            <h2>Выставки</h2>
+            <p>
+                Виртуальные подборки шумных фотографий в атмосфере старого
+                фотоархива: зерно, мягкий фокус, пересветы и винтажный свет.
+            </p>
+            <span class="feature-link">Смотреть выставки →</span>
+        </div>
+    </a>
+</section>
+
+{% endblock %}

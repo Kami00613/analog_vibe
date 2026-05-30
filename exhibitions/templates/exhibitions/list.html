@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="catalog-page">
+    <div class="catalog-head">
+        <h1>Виртуальные выставки</h1>
+        <p>
+            Подборки шумных фотографий с зерном, мягким фокусом,
+            теплым светом и атмосферой старых снимков.
+        </p>
+    </div>
+
+    <div class="item-grid">
+        {% for exhibition in exhibitions %}
+            <article class="item-card">
+                <div class="item-photo-place">
+                    <span>gallery</span>
+                </div>
+
+                <p class="item-meta">{{ exhibition.photos_count }} фото</p>
+
+                <h2>{{ exhibition.title }}</h2>
+
+                <p>{{ exhibition.description }}</p>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}
