@@ -6,8 +6,7 @@
     <div class="catalog-head">
         <h1>Каталог камер</h1>
         <p>
-            Здесь показаны винтажные камеры. Пока это mock-данные,
-            которые хранятся во views.py.
+            Здесь показаны винтажные камеры, загруженные из PostgreSQL.
         </p>
     </div>
 
@@ -18,7 +17,7 @@
                     <span>camera</span>
                 </div>
 
-                <p class="item-meta">{{ camera.brand }} · {{ camera.year }}</p>
+                <p class="item-meta">{{ camera.brand.name }} · {{ camera.year }}</p>
 
                 <h2>{{ camera.name }}</h2>
 
@@ -36,6 +35,8 @@
                     {% endif %}
                 </div>
             </article>
+        {% empty %}
+            <p>Камеры пока не добавлены.</p>
         {% endfor %}
     </div>
 </section>

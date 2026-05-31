@@ -23,7 +23,17 @@
                 <h2>{{ exhibition.title }}</h2>
 
                 <p>{{ exhibition.description }}</p>
+
+                <div class="badges">
+                    {% if exhibition.is_published %}
+                        <span class="badge badge-green">Опубликована</span>
+                    {% else %}
+                        <span class="badge badge-gold">Черновик</span>
+                    {% endif %}
+                </div>
             </article>
+        {% empty %}
+            <p>Выставки пока не добавлены.</p>
         {% endfor %}
     </div>
 </section>

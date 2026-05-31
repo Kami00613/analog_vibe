@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="catalog-page">
+    <div class="catalog-head">
+        <h1>Профиль автора</h1>
+        <p>
+            Участник сообщества AnalogVibe.
+        </p>
+    </div>
+
+    {% if profile %}
+        <div class="item-grid">
+            <article class="item-card">
+                <div class="item-photo-place">
+                    <span>author</span>
+                </div>
+
+                <p class="item-meta">{{ profile.user.username }}</p>
+
+                <h2>{{ profile.nickname }}</h2>
+
+                <p>{{ profile.bio }}</p>
+
+                <div class="badges">
+                    <span class="badge badge-gold">{{ profile.favorite_style }}</span>
+                </div>
+            </article>
+        </div>
+    {% else %}
+        <p>Профиль автора пока не создан.</p>
+    {% endif %}
+</section>
+
+{% endblock %}
