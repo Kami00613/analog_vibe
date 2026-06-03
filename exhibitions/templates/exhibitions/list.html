@@ -13,7 +13,7 @@
 
     <div class="item-grid">
         {% for exhibition in exhibitions %}
-            <article class="item-card">
+            <a class="item-card" href="{% url 'exhibitions:exhibition_detail' exhibition.id %}">
                 <div class="item-photo-place">
                     <span>gallery</span>
                 </div>
@@ -31,7 +31,7 @@
                         <span class="badge badge-gold">Черновик</span>
                     {% endif %}
                 </div>
-            </article>
+            </a>
         {% empty %}
             <p>Выставки пока не добавлены.</p>
         {% endfor %}

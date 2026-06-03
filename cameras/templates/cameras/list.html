@@ -6,13 +6,13 @@
     <div class="catalog-head">
         <h1>Каталог камер</h1>
         <p>
-            Здесь показаны винтажные камеры, загруженные из PostgreSQL.
+            Подборка винтажных камер с брендом, годом выпуска, состоянием и редкостью модели.
         </p>
     </div>
 
     <div class="item-grid">
         {% for camera in cameras %}
-            <article class="item-card">
+            <a class="item-card" href="{% url 'cameras:camera_detail' camera.id %}">
                 <div class="item-photo-place">
                     <span>camera</span>
                 </div>
@@ -34,7 +34,7 @@
                         <span class="badge badge-gold">Редкая</span>
                     {% endif %}
                 </div>
-            </article>
+            </a>
         {% empty %}
             <p>Камеры пока не добавлены.</p>
         {% endfor %}

@@ -6,13 +6,14 @@
     <div class="catalog-head">
         <h1>Пленочные пресеты</h1>
         <p>
-            Здесь собраны варианты обработки, которые имитируют пленочную фотографию.
+            Варианты обработки, которые имитируют пленочную фотографию: зерно,
+            теплые оттенки, мягкие тени и выцветшие цвета.
         </p>
     </div>
 
     <div class="item-grid">
         {% for preset in presets %}
-            <article class="item-card">
+            <a class="item-card" href="{% url 'presets:preset_detail' preset.id %}">
                 <div class="item-photo-place">
                     <span>preset</span>
                 </div>
@@ -30,7 +31,7 @@
                         <span class="badge badge-red">Личный</span>
                     {% endif %}
                 </div>
-            </article>
+            </a>
         {% empty %}
             <p>Пресеты пока не добавлены.</p>
         {% endfor %}

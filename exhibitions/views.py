@@ -1,4 +1,8 @@
-from django.shortcuts import render
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+
+from .forms import ExhibitionCommentForm
 from .models import Exhibition
 
 
@@ -10,3 +14,44 @@ def exhibition_list(request):
     }
 
     return render(request, 'exhibitions/list.html', context)
+
+
+def exhibition_detail(request, exhibition_id):
+    exhibition = get_object_or_404(Exhibition.objects.select_related('curator'), id=exhibition_id)
+    comments = exhibition.comments.filter(is_visible=True)
+
+    if request.method == 'POST':
+        form = ExhibitionCommentForm(request.POST)
+
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.exhibition = exhibition
+            comment.save()
+
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'comment': {
+                        'author_name': comment.author_name,
+                        'text': comment.text,
+                        'rating': comment.rating,
+                        'created_at': timezone.localtime(comment.created_at).strftime('%d.%m.%Y %H:%M'),
+                    }
+                })
+
+            return redirect('exhibitions:exhibition_detail', exhibition_id=exhibition.id)
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'errors': form.errors.as_text()
+            }, status=400)
+
+    else:
+        form = ExhibitionCommentForm()
+
+    context = {
+        'exhibition': exhibition,
+        'comments': comments,
+        'form': form,
+    }
+
+    return render(request, 'exhibitions/detail.html', context)

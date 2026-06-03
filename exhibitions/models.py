@@ -20,3 +20,33 @@ class Exhibition(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class ExhibitionComment(models.Model):
+    RATING_CHOICES = [
+        (1, '1 — не зацепило'),
+        (2, '2 — слабовато'),
+        (3, '3 — нормально'),
+        (4, '4 — атмосферно'),
+        (5, '5 — очень вайбово'),
+    ]
+
+    exhibition = models.ForeignKey(
+        Exhibition,
+        verbose_name='Выставка',
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    author_name = models.CharField('Имя автора', max_length=80)
+    text = models.TextField('Комментарий')
+    rating = models.IntegerField('Оценка', choices=RATING_CHOICES)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+    is_visible = models.BooleanField('Показывать на сайте', default=True)
+
+    class Meta:
+        verbose_name = 'Комментарий к выставке'
+        verbose_name_plural = 'Комментарии к выставкам'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.author_name}: {self.exhibition.title} — {self.rating}/5'

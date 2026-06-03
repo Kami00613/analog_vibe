@@ -32,3 +32,33 @@ class Camera(models.Model):
 
     def __str__(self):
         return f'{self.brand.name} {self.name}'
+
+
+class CameraReview(models.Model):
+    RATING_CHOICES = [
+        (1, '1 — не зацепило'),
+        (2, '2 — слабовато'),
+        (3, '3 — нормально'),
+        (4, '4 — атмосферно'),
+        (5, '5 — очень вайбово'),
+    ]
+
+    camera = models.ForeignKey(
+        Camera,
+        verbose_name='Камера',
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    author_name = models.CharField('Имя автора', max_length=80)
+    text = models.TextField('Комментарий')
+    rating = models.IntegerField('Оценка', choices=RATING_CHOICES)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+    is_visible = models.BooleanField('Показывать на сайте', default=True)
+
+    class Meta:
+        verbose_name = 'Комментарий к камере'
+        verbose_name_plural = 'Комментарии к камерам'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.author_name}: {self.camera.name} — {self.rating}/5'
