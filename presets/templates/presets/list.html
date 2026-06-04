@@ -3,35 +3,55 @@
 {% block content %}
 
 <section class="catalog-page">
-    <div class="catalog-head">
-        <h1>Пленочные пресеты</h1>
-        <p>
-            Варианты обработки, которые имитируют пленочную фотографию: зерно,
-            теплые оттенки, мягкие тени и выцветшие цвета.
-        </p>
+    <div class="catalog-head catalog-head-with-action">
+        <div>
+            <h1>Пленочные пресеты</h1>
+            <p>
+                Варианты обработки, которые имитируют пленочную фотографию:
+                зерно, теплые оттенки, мягкие тени и выцветшие цвета.
+            </p>
+        </div>
+
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'presets:preset_create' %}" class="hero-action-button">
+                Добавить пресет
+            </a>
+        {% endif %}
     </div>
 
     <div class="item-grid">
         {% for preset in presets %}
-            <a class="item-card" href="{% url 'presets:preset_detail' preset.id %}">
-                <div class="item-photo-place">
-                    <span>preset</span>
-                </div>
+            <article class="item-card" data-owned-card>
+                <a href="{% url 'presets:preset_detail' preset.id %}">
+                    <div class="item-photo-place">
+                        <span>preset</span>
+                    </div>
 
-                <p class="item-meta">{{ preset.tone }} · {{ preset.intensity }}%</p>
+                    <p class="item-meta">{{ preset.tone }} · {{ preset.intensity }}%</p>
 
-                <h2>{{ preset.title }}</h2>
+                    <h2>{{ preset.title }}</h2>
 
-                <p>{{ preset.description }}</p>
+                    <p>{{ preset.description }}</p>
+                </a>
 
-                <div class="badges">
-                    {% if preset.is_public %}
-                        <span class="badge badge-green">Открытый</span>
-                    {% else %}
-                        <span class="badge badge-red">Личный</span>
-                    {% endif %}
-                </div>
-            </a>
+                {% if preset.author == request.user %}
+                    <div class="card-actions">
+                        <a href="{% url 'presets:preset_edit' preset.id %}">
+                            Редактировать
+                        </a>
+
+                        <button type="button"
+                                class="inline-action-button danger-inline"
+                                data-object-delete
+                                data-delete-url="{% url 'presets:preset_delete' preset.id %}"
+                                data-csrf="{{ csrf_token }}"
+                                data-confirm-title="Удалить пресет?"
+                                data-confirm-text="Пресет исчезнет из общего списка. Отменить это действие нельзя.">
+                            Удалить
+                        </button>
+                    </div>
+                {% endif %}
+            </article>
         {% empty %}
             <p>Пресеты пока не добавлены.</p>
         {% endfor %}

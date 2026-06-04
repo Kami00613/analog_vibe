@@ -9,14 +9,6 @@ from .forms import PresetForm, PresetReviewForm
 from .models import Preset, PresetReview
 
 
-def is_ajax(request):
-    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
-
-
-def form_errors_as_text(form):
-    return form.errors.as_text() or 'Проверьте заполнение формы.'
-
-
 def preset_list(request):
     presets = Preset.objects.select_related('author').all()
 
@@ -52,7 +44,6 @@ def preset_create(request):
         if form.is_valid():
             preset = form.save(commit=False)
             preset.author = request.user
-            preset.is_public = True
             preset.save()
 
             return redirect('presets:preset_detail', preset_id=preset.id)
@@ -80,9 +71,7 @@ def preset_edit(request, preset_id):
         form = PresetForm(request.POST, instance=preset)
 
         if form.is_valid():
-            preset = form.save(commit=False)
-            preset.is_public = True
-            preset.save()
+            form.save()
             return redirect('presets:preset_detail', preset_id=preset.id)
     else:
         form = PresetForm(instance=preset)
@@ -107,13 +96,6 @@ def preset_delete(request, preset_id):
 
     if request.method == 'POST':
         preset.delete()
-
-        if is_ajax(request):
-            return JsonResponse({
-                'success': True,
-                'redirect_url': reverse('presets:preset_list'),
-            })
-
         return redirect('presets:preset_list')
 
     context = {
@@ -137,10 +119,9 @@ def add_preset_review(request, preset_id):
         review.rating = 5
         review.save()
 
-        if is_ajax(request):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'comment': {
-                    'id': review.id,
                     'author_name': review.author_name,
                     'text': review.text,
                     'created_at': timezone.localtime(review.created_at).strftime('%d.%m.%Y %H:%M'),
@@ -151,9 +132,9 @@ def add_preset_review(request, preset_id):
 
         return redirect('presets:preset_detail', preset_id=preset.id)
 
-    if is_ajax(request):
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({
-            'errors': form_errors_as_text(form)
+            'errors': form.errors.as_text()
         }, status=400)
 
     context = {
@@ -177,21 +158,8 @@ def edit_preset_review(request, review_id):
         form = PresetReviewForm(request.POST, instance=review)
 
         if form.is_valid():
-            review = form.save()
-
-            if is_ajax(request):
-                return JsonResponse({
-                    'success': True,
-                    'text': review.text,
-                })
-
+            form.save()
             return redirect('presets:preset_detail', preset_id=review.preset.id)
-
-        if is_ajax(request):
-            return JsonResponse({
-                'success': False,
-                'errors': form_errors_as_text(form),
-            }, status=400)
     else:
         form = PresetReviewForm(instance=review)
 
@@ -214,10 +182,6 @@ def delete_preset_review(request, review_id):
     if request.method == 'POST':
         preset_id = review.preset.id
         review.delete()
-
-        if is_ajax(request):
-            return JsonResponse({'success': True})
-
         return redirect('presets:preset_detail', preset_id=preset_id)
 
     context = {

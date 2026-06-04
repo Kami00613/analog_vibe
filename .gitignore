@@ -1,16 +1,29 @@
-.venv/
 venv/
+env/
+.venv/
 
 __pycache__/
 *.pyc
 *.pyo
 
+.env
+.env.local
+
 db.sqlite3
 
-.env
+pg_data/
+postgres_data/
+.docker-volumes/
+
+media/
+/media/
+
+staticfiles/
+
 *.log
 
 .idea/
+.vscode/
 
-staticfiles/
-media/
+.DS_Store
+Thumbs.db

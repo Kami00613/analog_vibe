@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="catalog-page">
+    <div class="catalog-head">
+        <h1>Удаление камеры</h1>
+        <p>
+            Удалить можно только свою запись. Это действие нельзя отменить.
+        </p>
+    </div>
+
+    <article class="review-form-card">
+        <h2>Удалить камеру?</h2>
+
+        <p class="item-meta">
+            {{ camera.brand.name }} · {{ camera.year }}
+        </p>
+
+        <p>
+            {{ camera.name }}
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="review-actions-panel">
+                <button type="submit" class="review-button review-delete-button">
+                    Да, удалить
+                </button>
+
+                <a href="{% url 'cameras:camera_detail' camera.id %}" class="text-link">
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </article>
+</section>
+
+{% endblock %}

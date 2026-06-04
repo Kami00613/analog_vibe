@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="catalog-page">
+    <div class="catalog-head">
+        <h1>Редактирование</h1>
+        <p>
+            Изменить можно только свой комментарий.
+        </p>
+    </div>
+
+    <article class="review-form-card">
+        <h2>Редактировать комментарий</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="review-field">
+                <label for="{{ form.text.id_for_label }}">Комментарий</label>
+                {{ form.text }}
+                <div class="review-field-errors">{{ form.text.errors }}</div>
+            </div>
+<div class="review-actions-panel">
+                <button type="submit" class="review-button">
+                    Сохранить
+                </button>
+
+                <a href="{% url 'cameras:camera_detail' review.camera.id %}" class="text-link">
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </article>
+</section>
+
+{% endblock %}

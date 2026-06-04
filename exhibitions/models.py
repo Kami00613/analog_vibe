@@ -6,8 +6,10 @@ class Exhibition(models.Model):
     curator = models.ForeignKey(
         User,
         verbose_name='Куратор',
-        on_delete=models.CASCADE,
-        related_name='exhibitions'
+        on_delete=models.SET_NULL,
+        related_name='exhibitions',
+        null=True,
+        blank=True
     )
     title = models.CharField('Название выставки', max_length=120)
     description = models.TextField('Описание')
@@ -22,7 +24,7 @@ class Exhibition(models.Model):
         return self.title
 
 
-class ExhibitionComment(models.Model):
+class ExhibitionReview(models.Model):
     RATING_CHOICES = [
         (1, '1 — не зацепило'),
         (2, '2 — слабовато'),
@@ -35,13 +37,13 @@ class ExhibitionComment(models.Model):
         Exhibition,
         verbose_name='Выставка',
         on_delete=models.CASCADE,
-        related_name='comments'
+        related_name='reviews'
     )
     author = models.ForeignKey(
         User,
         verbose_name='Автор',
-        on_delete=models.CASCADE,
-        related_name='exhibition_comments',
+        on_delete=models.SET_NULL,
+        related_name='exhibition_reviews',
         null=True,
         blank=True
     )

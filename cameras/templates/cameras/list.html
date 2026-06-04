@@ -3,25 +3,38 @@
 {% block content %}
 
 <section class="catalog-page">
-    <div class="catalog-head">
-        <h1>Каталог камер</h1>
-        <p>
-            Подборка винтажных камер с брендом, годом выпуска, состоянием и редкостью модели.
-        </p>
+    <div class="catalog-head catalog-head-with-action">
+        <div>
+            <h1>Каталог камер</h1>
+            <p>
+                Архив винтажных камер сообщества: бренд, год выпуска,
+                состояние и редкость модели.
+            </p>
+        </div>
+
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'cameras:camera_create' %}" class="hero-action-button">
+                Добавить камеру
+            </a>
+        {% endif %}
     </div>
 
     <div class="item-grid">
         {% for camera in cameras %}
-            <a class="item-card" href="{% url 'cameras:camera_detail' camera.id %}">
-                <div class="item-photo-place">
-                    <span>camera</span>
-                </div>
+            <article class="item-card" data-owned-card>
+                <a href="{% url 'cameras:camera_detail' camera.id %}">
+                    <div class="item-photo-place">
+                        <span>camera</span>
+                    </div>
 
-                <p class="item-meta">{{ camera.brand.name }} · {{ camera.year }}</p>
+                    <p class="item-meta">
+                        {{ camera.brand.name }} · {{ camera.year }}
+                    </p>
 
-                <h2>{{ camera.name }}</h2>
+                    <h2>{{ camera.name }}</h2>
 
-                <p>{{ camera.description }}</p>
+                    <p>{{ camera.description }}</p>
+                </a>
 
                 <div class="badges">
                     {% if camera.is_working %}
@@ -34,7 +47,25 @@
                         <span class="badge badge-gold">Редкая</span>
                     {% endif %}
                 </div>
-            </a>
+
+                {% if camera.owner == request.user %}
+                    <div class="card-actions">
+                        <a href="{% url 'cameras:camera_edit' camera.id %}">
+                            Редактировать
+                        </a>
+
+                        <button type="button"
+                                class="inline-action-button danger-inline"
+                                data-object-delete
+                                data-delete-url="{% url 'cameras:camera_delete' camera.id %}"
+                                data-csrf="{{ csrf_token }}"
+                                data-confirm-title="Удалить камеру?"
+                                data-confirm-text="Камера исчезнет из общего архива. Отменить это действие нельзя.">
+                            Удалить
+                        </button>
+                    </div>
+                {% endif %}
+            </article>
         {% empty %}
             <p>Камеры пока не добавлены.</p>
         {% endfor %}

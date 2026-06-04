@@ -9,13 +9,14 @@ BAD_WORDS = ['дурак', 'тупой', 'идиот']
 class PresetForm(forms.ModelForm):
     class Meta:
         model = Preset
-        fields = ['title', 'tone', 'description', 'intensity']
+        fields = ['title', 'tone', 'description', 'intensity', 'is_public']
 
         labels = {
             'title': 'Название пресета',
             'tone': 'Тон',
             'description': 'Описание',
             'intensity': 'Интенсивность',
+            'is_public': 'Открытый пресет',
         }
 
         widgets = {

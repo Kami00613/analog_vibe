@@ -3,35 +3,55 @@
 {% block content %}
 
 <section class="catalog-page">
-    <div class="catalog-head">
-        <h1>Виртуальные выставки</h1>
-        <p>
-            Подборки шумных фотографий с зерном, мягким фокусом,
-            теплым светом и атмосферой старых снимков.
-        </p>
+    <div class="catalog-head catalog-head-with-action">
+        <div>
+            <h1>Виртуальные выставки</h1>
+            <p>
+                Подборки шумных фотографий с зерном, мягким фокусом,
+                теплым светом и атмосферой старых снимков.
+            </p>
+        </div>
+
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'exhibitions:exhibition_create' %}" class="hero-action-button">
+                Добавить выставку
+            </a>
+        {% endif %}
     </div>
 
     <div class="item-grid">
         {% for exhibition in exhibitions %}
-            <a class="item-card" href="{% url 'exhibitions:exhibition_detail' exhibition.id %}">
-                <div class="item-photo-place">
-                    <span>gallery</span>
-                </div>
+            <article class="item-card" data-owned-card>
+                <a href="{% url 'exhibitions:exhibition_detail' exhibition.id %}">
+                    <div class="item-photo-place">
+                        <span>gallery</span>
+                    </div>
 
-                <p class="item-meta">{{ exhibition.photos_count }} фото</p>
+                    <p class="item-meta">{{ exhibition.photos_count }} фото</p>
 
-                <h2>{{ exhibition.title }}</h2>
+                    <h2>{{ exhibition.title }}</h2>
 
-                <p>{{ exhibition.description }}</p>
+                    <p>{{ exhibition.description }}</p>
+                </a>
 
-                <div class="badges">
-                    {% if exhibition.is_published %}
-                        <span class="badge badge-green">Опубликована</span>
-                    {% else %}
-                        <span class="badge badge-gold">Черновик</span>
-                    {% endif %}
-                </div>
-            </a>
+                {% if exhibition.curator == request.user %}
+                    <div class="card-actions">
+                        <a href="{% url 'exhibitions:exhibition_edit' exhibition.id %}">
+                            Редактировать
+                        </a>
+
+                        <button type="button"
+                                class="inline-action-button danger-inline"
+                                data-object-delete
+                                data-delete-url="{% url 'exhibitions:exhibition_delete' exhibition.id %}"
+                                data-csrf="{{ csrf_token }}"
+                                data-confirm-title="Удалить выставку?"
+                                data-confirm-text="Выставка исчезнет из общего списка. Отменить это действие нельзя.">
+                            Удалить
+                        </button>
+                    </div>
+                {% endif %}
+            </article>
         {% empty %}
             <p>Выставки пока не добавлены.</p>
         {% endfor %}

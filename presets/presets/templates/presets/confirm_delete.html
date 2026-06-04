@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="catalog-page">
+    <div class="catalog-head">
+        <h1>Удаление пресета</h1>
+        <p>
+            Удалить можно только свой пресет.
+        </p>
+    </div>
+
+    <article class="review-form-card">
+        <h2>Удалить пресет?</h2>
+
+        <p class="item-meta">
+            {{ preset.tone }} · {{ preset.intensity }}%
+        </p>
+
+        <p>
+            {{ preset.title }}
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="review-actions-panel">
+                <button type="submit" class="review-button review-delete-button">
+                    Да, удалить
+                </button>
+
+                <a href="{% url 'presets:preset_detail' preset.id %}" class="text-link">
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </article>
+</section>
+
+{% endblock %}

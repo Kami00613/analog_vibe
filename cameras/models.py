@@ -15,10 +15,18 @@ class CameraBrand(models.Model):
 
 
 class Camera(models.Model):
+    owner = models.ForeignKey(
+        User,
+        verbose_name='Автор записи',
+        on_delete=models.SET_NULL,
+        related_name='cameras',
+        null=True,
+        blank=True
+    )
     brand = models.ForeignKey(
         CameraBrand,
         verbose_name='Бренд',
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name='cameras'
     )
     name = models.CharField('Название камеры', max_length=120)
@@ -53,7 +61,7 @@ class CameraReview(models.Model):
     author = models.ForeignKey(
         User,
         verbose_name='Автор',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='camera_reviews',
         null=True,
         blank=True

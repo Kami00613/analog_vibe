@@ -9,156 +9,111 @@
         <p>{{ exhibition.description }}</p>
     </div>
 
-    <article style="
-        margin-bottom: 28px;
-        padding: 24px;
-        background: #f2d9b3;
-        border: 2px solid rgba(31, 23, 18, 0.22);
-    ">
+    <article class="detail-card" data-owned-card>
         <div class="item-photo-place">
             <span>gallery detail</span>
         </div>
 
         <p class="item-meta">
-            Куратор: {{ exhibition.curator.username }} · {{ exhibition.photos_count }} фото
+            {% if exhibition.curator %}
+                Куратор: {{ exhibition.curator.username }} ·
+            {% endif %}
+            {{ exhibition.photos_count }} фото
         </p>
 
-        <div class="badges">
-            {% if exhibition.is_published %}
-                <span class="badge badge-green">Опубликована</span>
-            {% else %}
-                <span class="badge badge-gold">Черновик</span>
-            {% endif %}
-        </div>
+        {% if exhibition.curator == request.user %}
+            <div class="card-actions">
+                <a href="{% url 'exhibitions:exhibition_edit' exhibition.id %}">
+                    Редактировать
+                </a>
+
+                <button type="button"
+                        class="inline-action-button danger-inline"
+                        data-object-delete
+                        data-delete-url="{% url 'exhibitions:exhibition_delete' exhibition.id %}"
+                        data-delete-redirect="{% url 'exhibitions:exhibition_list' %}"
+                        data-csrf="{{ csrf_token }}"
+                        data-confirm-title="Удалить выставку?"
+                        data-confirm-text="Выставка исчезнет из общего списка. Отменить это действие нельзя.">
+                    Удалить
+                </button>
+            </div>
+        {% endif %}
     </article>
 
-    <article style="
-        margin-bottom: 28px;
-        padding: 28px;
-        background: rgba(255, 244, 220, 0.58);
-        border: 2px solid rgba(31, 23, 18, 0.16);
-    ">
+    <article class="review-form-card review-form-card-compact">
         {% if request.user.is_authenticated %}
-            <h2 style="margin-top: 0; margin-bottom: 10px;">
-                Оставить комментарий
-            </h2>
+            <h2>Оставить комментарий</h2>
 
-            <p class="item-meta" style="margin-bottom: 22px;">
-                Комментарий будет опубликован от имени {{ request.user.username }}
-            </p>
-
-            <form method="post" data-comment-form>
+            <form method="post" action="{% url 'exhibitions:add_exhibition_review' exhibition.id %}" data-comment-form>
                 {% csrf_token %}
 
-                <div data-form-status style="
-                    margin-bottom: 14px;
-                    color: #7a271b;
-                    font-weight: 700;
-                "></div>
+                <div data-form-status class="form-status"></div>
 
-                <div style="margin-bottom: 18px;">
-                    <label for="{{ form.text.id_for_label }}" style="
-                        display: block;
-                        margin-bottom: 8px;
-                        font-weight: 700;
-                    ">
-                        Комментарий
-                    </label>
-
+                <div class="review-field">
+                    <label for="{{ form.text.id_for_label }}">Комментарий</label>
                     {{ form.text }}
-
-                    <div style="margin-top: 6px; color: #7a271b;">
-                        {{ form.text.errors }}
-                    </div>
+                    <div class="review-field-errors">{{ form.text.errors }}</div>
                 </div>
 
-                <div style="margin-bottom: 20px;">
-                    <label for="{{ form.rating.id_for_label }}" style="
-                        display: block;
-                        margin-bottom: 8px;
-                        font-weight: 700;
-                    ">
-                        Оценка
-                    </label>
-
-                    {{ form.rating }}
-
-                    <div style="margin-top: 6px; color: #7a271b;">
-                        {{ form.rating.errors }}
-                    </div>
-                </div>
-
-                <button
-                    type="submit"
-                    data-default-text="Отправить комментарий"
-                    style="
-                        padding: 12px 18px;
-                        border: none;
-                        background: #1d1510;
-                        color: #f6dfb8;
-                        font-weight: 900;
-                        text-transform: uppercase;
-                        cursor: pointer;
-                    "
-                >
+                <button type="submit" data-default-text="Отправить комментарий" class="review-button">
                     Отправить комментарий
                 </button>
             </form>
         {% else %}
-            <h2 style="margin-top: 0;">
-                Комментарии доступны после входа
-            </h2>
+            <h2>Комментарии доступны после входа</h2>
 
-            <p style="line-height: 1.6;">
+            <p>
                 Чтобы оставить комментарий к выставке, войдите в аккаунт или зарегистрируйтесь.
             </p>
 
-            <p style="margin-bottom: 0;">
-                <a href="{% url 'accounts:login' %}" style="
-                    font-weight: 900;
-                    border-bottom: 2px solid #1d1510;
-                ">
-                    Войти
-                </a>
+            <p>
+                <a href="{% url 'accounts:login' %}" class="text-link">Войти</a>
                 ·
-                <a href="{% url 'accounts:register' %}" style="
-                    font-weight: 900;
-                    border-bottom: 2px solid #1d1510;
-                ">
-                    Зарегистрироваться
-                </a>
+                <a href="{% url 'accounts:register' %}" class="text-link">Зарегистрироваться</a>
             </p>
         {% endif %}
     </article>
 
-    <section>
-        <h2 style="margin-top: 0;">Комментарии</h2>
+    <section class="comments-section">
+        <h2 class="comments-title">Комментарии</h2>
 
         <div data-comments-list>
-            {% for comment in comments %}
-                <article style="
-                    margin-bottom: 16px;
-                    padding: 18px;
-                    background: #f2d9b3;
-                    border: 2px solid rgba(31, 23, 18, 0.18);
-                ">
+            {% for review in reviews %}
+                <article class="review-card" data-review-card>
                     <p class="item-meta">
-                        {% if comment.author %}
-                            {{ comment.author.username }}
+                        {% if review.author %}
+                            {{ review.author.username }}
                         {% else %}
-                            {{ comment.author_name }}
+                            {{ review.author_name }}
                         {% endif %}
-                        · оценка {{ comment.rating }}/5 · {{ comment.created_at|date:'d.m.Y H:i' }}
+                        · {{ review.created_at|date:'d.m.Y H:i' }}
                     </p>
 
-                    <p style="margin-bottom: 0;">
-                        {{ comment.text }}
-                    </p>
+                    <p data-review-text>{{ review.text }}</p>
+
+                    {% if review.author == request.user %}
+                        <div class="review-actions">
+                            <button type="button"
+                                    class="inline-action-button"
+                                    data-review-edit
+                                    data-edit-url="{% url 'exhibitions:edit_exhibition_review' review.id %}"
+                                    data-csrf="{{ csrf_token }}">
+                                Редактировать
+                            </button>
+
+                            <button type="button"
+                                    class="inline-action-button danger-inline"
+                                    data-review-delete
+                                    data-delete-url="{% url 'exhibitions:delete_exhibition_review' review.id %}"
+                                    data-csrf="{{ csrf_token }}">
+                                Удалить
+                            </button>
+                        </div>
+                    {% endif %}
                 </article>
             {% empty %}
-                <p data-empty-comments>
-                    Комментариев пока нет. Можно оставить первый.
-                </p>
+                <p data-empty-comments>Комментариев пока нет. Можно оставить первый.</p>
             {% endfor %}
         </div>
     </section>
@@ -167,5 +122,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/comments.js' %}?v=comments-3"></script>
+<script src="{% static 'js/comments.js' %}?v=comments-clean-07"></script>
 {% endblock %}

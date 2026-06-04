@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="catalog-page">
+    <div class="catalog-head">
+        <h1>Удаление выставки</h1>
+        <p>
+            Удалить можно только свою выставку.
+        </p>
+    </div>
+
+    <article class="review-form-card">
+        <h2>Удалить выставку?</h2>
+
+        <p class="item-meta">
+            {{ exhibition.photos_count }} фото
+        </p>
+
+        <p>
+            {{ exhibition.title }}
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="review-actions-panel">
+                <button type="submit" class="review-button review-delete-button">
+                    Да, удалить
+                </button>
+
+                <a href="{% url 'exhibitions:exhibition_detail' exhibition.id %}" class="text-link">
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </article>
+</section>
+
+{% endblock %}

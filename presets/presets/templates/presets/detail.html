@@ -9,7 +9,7 @@
         <p>{{ preset.description }}</p>
     </div>
 
-    <article class="detail-card" data-owned-card>
+    <article class="detail-card">
         <div class="item-photo-place">
             <span>preset detail</span>
         </div>
@@ -21,29 +21,29 @@
             {% endif %}
         </p>
 
+        <div class="badges">
+            {% if preset.is_public %}
+                <span class="badge badge-green">Открытый</span>
+            {% else %}
+                <span class="badge badge-red">Личный</span>
+            {% endif %}
+        </div>
+
         {% if preset.author == request.user %}
             <div class="card-actions">
-                <a href="{% url 'presets:preset_edit' preset.id %}">
-                    Редактировать
-                </a>
-
-                <button type="button"
-                        class="inline-action-button danger-inline"
-                        data-object-delete
-                        data-delete-url="{% url 'presets:preset_delete' preset.id %}"
-                        data-delete-redirect="{% url 'presets:preset_list' %}"
-                        data-csrf="{{ csrf_token }}"
-                        data-confirm-title="Удалить пресет?"
-                        data-confirm-text="Пресет исчезнет из общего списка. Отменить это действие нельзя.">
-                    Удалить
-                </button>
+                <a href="{% url 'presets:preset_edit' preset.id %}">Редактировать</a>
+                <a href="{% url 'presets:preset_delete' preset.id %}">Удалить</a>
             </div>
         {% endif %}
     </article>
 
-    <article class="review-form-card review-form-card-compact">
+    <article class="review-form-card">
         {% if request.user.is_authenticated %}
             <h2>Оставить комментарий</h2>
+
+            <p class="item-meta">
+                Комментарий будет опубликован от имени {{ request.user.username }}
+            </p>
 
             <form method="post" action="{% url 'presets:add_preset_review' preset.id %}" data-comment-form>
                 {% csrf_token %}
@@ -55,8 +55,7 @@
                     {{ form.text }}
                     <div class="review-field-errors">{{ form.text.errors }}</div>
                 </div>
-
-                <button type="submit" data-default-text="Отправить комментарий" class="review-button">
+<button type="submit" data-default-text="Отправить комментарий" class="review-button">
                     Отправить комментарий
                 </button>
             </form>
@@ -75,12 +74,12 @@
         {% endif %}
     </article>
 
-    <section class="comments-section">
-        <h2 class="comments-title">Комментарии</h2>
+    <section>
+        <h2 style="margin-top: 0;">Комментарии</h2>
 
         <div data-comments-list>
             {% for review in reviews %}
-                <article class="review-card" data-review-card>
+                <article class="review-card">
                     <p class="item-meta">
                         {% if review.author %}
                             {{ review.author.username }}
@@ -90,25 +89,17 @@
                         · {{ review.created_at|date:'d.m.Y H:i' }}
                     </p>
 
-                    <p data-review-text>{{ review.text }}</p>
+                    <p>{{ review.text }}</p>
 
                     {% if review.author == request.user %}
                         <div class="review-actions">
-                            <button type="button"
-                                    class="inline-action-button"
-                                    data-review-edit
-                                    data-edit-url="{% url 'presets:edit_preset_review' review.id %}"
-                                    data-csrf="{{ csrf_token }}">
+                            <a href="{% url 'presets:edit_preset_review' review.id %}">
                                 Редактировать
-                            </button>
+                            </a>
 
-                            <button type="button"
-                                    class="inline-action-button danger-inline"
-                                    data-review-delete
-                                    data-delete-url="{% url 'presets:delete_preset_review' review.id %}"
-                                    data-csrf="{{ csrf_token }}">
+                            <a href="{% url 'presets:delete_preset_review' review.id %}">
                                 Удалить
-                            </button>
+                            </a>
                         </div>
                     {% endif %}
                 </article>
@@ -122,5 +113,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/comments.js' %}?v=comments-clean-07"></script>
+<script src="{% static 'js/comments.js' %}?v=crud-07"></script>
 {% endblock %}

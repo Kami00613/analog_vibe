@@ -1,29 +1,76 @@
 from django import forms
 
-from .models import CameraReview
+from .models import Camera, CameraReview
 
 
 BAD_WORDS = ['дурак', 'тупой', 'идиот']
 
 
+class CameraForm(forms.ModelForm):
+    class Meta:
+        model = Camera
+        fields = ['brand', 'name', 'year', 'description', 'is_working', 'is_rare']
+
+        labels = {
+            'brand': 'Бренд',
+            'name': 'Название камеры',
+            'year': 'Год выпуска',
+            'description': 'Описание',
+            'is_working': 'Камера рабочая',
+            'is_rare': 'Редкая модель',
+        }
+
+        widgets = {
+            'brand': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'name': forms.TextInput(attrs={
+                'placeholder': 'Например: Zenit-E',
+                'class': 'form-control'
+            }),
+            'year': forms.NumberInput(attrs={
+                'placeholder': 'Например: 1965',
+                'class': 'form-control'
+            }),
+            'description': forms.Textarea(attrs={
+                'rows': 5,
+                'placeholder': 'Опишите камеру, её состояние и атмосферу снимков...',
+                'class': 'form-control'
+            }),
+            'is_working': forms.CheckboxInput(attrs={
+                'class': 'form-checkbox'
+            }),
+            'is_rare': forms.CheckboxInput(attrs={
+                'class': 'form-checkbox'
+            }),
+        }
+
+    def clean_year(self):
+        year = self.cleaned_data.get('year')
+
+        if year < 1800:
+            raise forms.ValidationError('Год выпуска не может быть меньше 1800.')
+
+        if year > 2035:
+            raise forms.ValidationError('Год выпуска выглядит слишком большим.')
+
+        return year
+
+
 class CameraReviewForm(forms.ModelForm):
     class Meta:
         model = CameraReview
-        fields = ['text', 'rating']
+        fields = ['text']
 
         labels = {
             'text': 'Комментарий',
-            'rating': 'Оценка',
         }
 
         widgets = {
             'text': forms.Textarea(attrs={
                 'rows': 4,
                 'placeholder': 'Напишите, какие ощущения вызывает эта камера...',
-                'style': 'width: 100%; max-width: 620px; padding: 10px; border: 1px solid rgba(31, 23, 18, 0.35); background: #fff4dc;'
-            }),
-            'rating': forms.Select(attrs={
-                'style': 'padding: 8px; border: 1px solid rgba(31, 23, 18, 0.35); background: #fff4dc;'
+                'class': 'form-control'
             }),
         }
 
@@ -39,11 +86,3 @@ class CameraReviewForm(forms.ModelForm):
                 raise forms.ValidationError('Комментарий содержит недопустимое слово.')
 
         return text
-
-    def clean_rating(self):
-        rating = self.cleaned_data.get('rating')
-
-        if rating is not None and (rating < 1 or rating > 5):
-            raise forms.ValidationError('Оценка должна быть от 1 до 5.')
-
-        return rating
