@@ -38,7 +38,15 @@ class PresetReview(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews'
     )
-    author_name = models.CharField('Имя автора', max_length=80)
+    author = models.ForeignKey(
+        User,
+        verbose_name='Автор',
+        on_delete=models.CASCADE,
+        related_name='preset_reviews',
+        null=True,
+        blank=True
+    )
+    author_name = models.CharField('Имя автора', max_length=80, default='Guest')
     text = models.TextField('Комментарий')
     rating = models.IntegerField('Оценка', choices=RATING_CHOICES)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)

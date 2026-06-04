@@ -32,45 +32,53 @@
     </article>
 
     <article style="margin-bottom: 28px; padding: 28px; background: rgba(255, 244, 220, 0.58); border: 2px solid rgba(31, 23, 18, 0.16);">
-        <h2 style="margin-top: 0; margin-bottom: 22px;">Оставить комментарий</h2>
+        {% if request.user.is_authenticated %}
+            <h2 style="margin-top: 0; margin-bottom: 10px;">Оставить комментарий</h2>
+            <p class="item-meta" style="margin-bottom: 22px;">
+                Комментарий будет опубликован от имени {{ request.user.username }}
+            </p>
 
-        <form method="post" data-comment-form>
-            {% csrf_token %}
+            <form method="post" data-comment-form>
+                {% csrf_token %}
 
-            <div data-form-status style="margin-bottom: 14px; color: #7a271b; font-weight: 700;"></div>
+                <div data-form-status style="margin-bottom: 14px; color: #7a271b; font-weight: 700;"></div>
 
-            <div style="margin-bottom: 18px;">
-                <label for="{{ form.author_name.id_for_label }}" style="display: block; margin-bottom: 8px; font-weight: 700;">
-                    Ваше имя
-                </label>
-                {{ form.author_name }}
-                <div style="margin-top: 6px; color: #7a271b;">{{ form.author_name.errors }}</div>
-            </div>
+                <div style="margin-bottom: 18px;">
+                    <label for="{{ form.text.id_for_label }}" style="display: block; margin-bottom: 8px; font-weight: 700;">
+                        Комментарий
+                    </label>
+                    {{ form.text }}
+                    <div style="margin-top: 6px; color: #7a271b;">{{ form.text.errors }}</div>
+                </div>
 
-            <div style="margin-bottom: 18px;">
-                <label for="{{ form.text.id_for_label }}" style="display: block; margin-bottom: 8px; font-weight: 700;">
-                    Комментарий
-                </label>
-                {{ form.text }}
-                <div style="margin-top: 6px; color: #7a271b;">{{ form.text.errors }}</div>
-            </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="{{ form.rating.id_for_label }}" style="display: block; margin-bottom: 8px; font-weight: 700;">
+                        Оценка
+                    </label>
+                    {{ form.rating }}
+                    <div style="margin-top: 6px; color: #7a271b;">{{ form.rating.errors }}</div>
+                </div>
 
-            <div style="margin-bottom: 20px;">
-                <label for="{{ form.rating.id_for_label }}" style="display: block; margin-bottom: 8px; font-weight: 700;">
-                    Оценка
-                </label>
-                {{ form.rating }}
-                <div style="margin-top: 6px; color: #7a271b;">{{ form.rating.errors }}</div>
-            </div>
+                <button
+                    type="submit"
+                    data-default-text="Отправить комментарий"
+                    style="padding: 12px 18px; border: none; background: #1d1510; color: #f6dfb8; font-weight: 900; text-transform: uppercase; cursor: pointer;"
+                >
+                    Отправить комментарий
+                </button>
+            </form>
+        {% else %}
+            <h2 style="margin-top: 0;">Комментарии доступны после входа</h2>
+            <p style="line-height: 1.6;">
+                Чтобы оставить комментарий к камере, войдите в аккаунт или зарегистрируйтесь.
+            </p>
 
-            <button
-                type="submit"
-                data-default-text="Отправить комментарий"
-                style="padding: 12px 18px; border: none; background: #1d1510; color: #f6dfb8; font-weight: 900; text-transform: uppercase; cursor: pointer;"
-            >
-                Отправить комментарий
-            </button>
-        </form>
+            <p style="margin-bottom: 0;">
+                <a href="{% url 'accounts:login' %}" style="font-weight: 900; border-bottom: 2px solid #1d1510;">Войти</a>
+                ·
+                <a href="{% url 'accounts:register' %}" style="font-weight: 900; border-bottom: 2px solid #1d1510;">Зарегистрироваться</a>
+            </p>
+        {% endif %}
     </article>
 
     <section>
@@ -80,7 +88,12 @@
             {% for review in reviews %}
                 <article style="margin-bottom: 16px; padding: 18px; background: #f2d9b3; border: 2px solid rgba(31, 23, 18, 0.18);">
                     <p class="item-meta">
-                        {{ review.author_name }} · оценка {{ review.rating }}/5 · {{ review.created_at|date:'d.m.Y H:i' }}
+                        {% if review.author %}
+                            {{ review.author.username }}
+                        {% else %}
+                            {{ review.author_name }}
+                        {% endif %}
+                        · оценка {{ review.rating }}/5 · {{ review.created_at|date:'d.m.Y H:i' }}
                     </p>
 
                     <p style="margin-bottom: 0;">{{ review.text }}</p>
@@ -95,5 +108,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/comments.js' %}?v=comments-1"></script>
+<script src="{% static 'js/comments.js' %}?v=comments-3"></script>
 {% endblock %}

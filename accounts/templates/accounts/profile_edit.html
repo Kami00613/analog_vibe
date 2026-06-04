@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="profile-page">
+    <div class="profile-edit-hero">
+        <p class="profile-kicker">edit profile</p>
+
+        <h1>Редактирование</h1>
+
+        <p>
+            Обновите никнейм, описание, любимый стиль и телефон.
+            После сохранения вы вернётесь в личный кабинет.
+        </p>
+    </div>
+
+    <article class="profile-edit-card">
+        <div class="profile-edit-head">
+            <p class="profile-meta">{{ request.user.username }}</p>
+            <h2>Настройки профиля</h2>
+        </div>
+
+        <form method="post" class="profile-form" data-profile-form>
+            {% csrf_token %}
+
+            <div class="profile-errors" data-profile-form-errors style="display: none;"></div>
+
+            {% if form.non_field_errors %}
+                <div class="profile-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="profile-field">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    <div class="profile-field-errors" data-field-error="{{ field.name }}">
+                        {{ field.errors }}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="profile-actions">
+                <button type="submit" class="profile-save-button" data-default-text="Сохранить профиль">
+                    Сохранить профиль
+                </button>
+
+                <a href="{% url 'accounts:profile' %}" class="profile-cancel-link">
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </article>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/profile_form.js' %}?v=profile-ajax-01"></script>
+{% endblock %}

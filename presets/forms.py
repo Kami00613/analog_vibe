@@ -1,23 +1,22 @@
 from django import forms
+
 from .models import PresetReview
+
+
+BAD_WORDS = ['дурак', 'тупой', 'идиот']
 
 
 class PresetReviewForm(forms.ModelForm):
     class Meta:
         model = PresetReview
-        fields = ['author_name', 'text', 'rating']
+        fields = ['text', 'rating']
 
         labels = {
-            'author_name': 'Ваше имя',
             'text': 'Комментарий',
             'rating': 'Оценка',
         }
 
         widgets = {
-            'author_name': forms.TextInput(attrs={
-                'placeholder': 'Например: Лена',
-                'style': 'width: 100%; max-width: 420px; padding: 10px; border: 1px solid rgba(31, 23, 18, 0.35); background: #fff4dc;'
-            }),
             'text': forms.Textarea(attrs={
                 'rows': 4,
                 'placeholder': 'Напишите, как этот пресет выглядит на кадрах...',
@@ -28,18 +27,23 @@ class PresetReviewForm(forms.ModelForm):
             }),
         }
 
-    def clean_author_name(self):
-        author_name = self.cleaned_data.get('author_name', '').strip()
-
-        if len(author_name) < 2:
-            raise forms.ValidationError('Имя должно быть не короче 2 символов.')
-
-        return author_name
-
     def clean_text(self):
         text = self.cleaned_data.get('text', '').strip()
+        lower_text = text.lower()
 
         if len(text) < 5:
             raise forms.ValidationError('Комментарий должен быть не короче 5 символов.')
 
+        for word in BAD_WORDS:
+            if word in lower_text:
+                raise forms.ValidationError('Комментарий содержит недопустимое слово.')
+
         return text
+
+    def clean_rating(self):
+        rating = self.cleaned_data.get('rating')
+
+        if rating is not None and (rating < 1 or rating > 5):
+            raise forms.ValidationError('Оценка должна быть от 1 до 5.')
+
+        return rating

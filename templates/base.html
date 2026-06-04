@@ -5,20 +5,23 @@
 <head>
     <meta charset="UTF-8">
     <title>AnalogVibe</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=analog-vibe-3">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=analog-compact-auth-final">
 </head>
 <body>
 <div class="page">
 
     <header class="topbar">
-        <a class="logo" href="{% url 'cameras:home' %}">AnalogVibe</a>
-
         <nav class="nav">
             <a href="{% url 'cameras:home' %}">Главная</a>
             <a href="{% url 'cameras:camera_list' %}">Камеры</a>
             <a href="{% url 'presets:preset_list' %}">Пресеты</a>
             <a href="{% url 'exhibitions:exhibition_list' %}">Выставки</a>
-            <a href="{% url 'accounts:profile' %}">Автор</a>
+
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'accounts:profile' %}">Профиль</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}">Войти</a>
+            {% endif %}
         </nav>
     </header>
 

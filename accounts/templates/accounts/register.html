@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="auth-page">
+    <div class="auth-hero">
+        <p class="auth-kicker">Analog photo community</p>
+        <h1>Регистрация</h1>
+        <p>
+            Создайте аккаунт, чтобы делиться впечатлениями
+            и участвовать в визуальной атмосфере AnalogVibe.
+        </p>
+    </div>
+
+    <article class="auth-card">
+        <div class="auth-card-head">
+            <p class="auth-number">register</p>
+            <h2>Регистрация</h2>
+            <p>
+                Заполните все поля для регистрации.
+            </p>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="auth-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="auth-field">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    <div class="auth-field-errors">
+                        {{ field.errors }}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="auth-button">
+                Создать аккаунт
+            </button>
+        </form>
+
+        <div class="auth-bottom">
+            <p>Уже есть аккаунт?</p>
+            <a href="{% url 'accounts:login' %}">
+                Войти
+            </a>
+        </div>
+    </article>
+</section>
+
+{% endblock %}

@@ -18,14 +18,24 @@ def preset_list(request):
 
 def preset_detail(request, preset_id):
     preset = get_object_or_404(Preset.objects.select_related('author'), id=preset_id)
-    reviews = preset.reviews.filter(is_visible=True)
+    reviews = preset.reviews.filter(is_visible=True).select_related('author')
 
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'errors': 'Чтобы оставить комментарий, нужно войти в аккаунт.'
+                }, status=403)
+
+            return redirect('accounts:login')
+
         form = PresetReviewForm(request.POST)
 
         if form.is_valid():
             review = form.save(commit=False)
             review.preset = preset
+            review.author = request.user
+            review.author_name = request.user.username
             review.save()
 
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':

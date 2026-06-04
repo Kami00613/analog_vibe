@@ -2,35 +2,103 @@
 
 {% block content %}
 
-<section class="catalog-page">
-    <div class="catalog-head">
-        <h1>Профиль автора</h1>
-        <p>
-            Участник сообщества AnalogVibe.
-        </p>
+<section class="profile-page">
+    <div class="profile-hero">
+        <div class="profile-hero-text">
+            <p class="profile-kicker">personal archive</p>
+            <h1>Профиль</h1>
+            <p>
+                Профиль пользователя AnalogVibe.
+            </p>
+        </div>
+
+        <form action="{% url 'accounts:logout' %}" method="post" class="profile-hero-logout-form">
+            {% csrf_token %}
+            <button type="submit" class="profile-hero-logout-button">
+                Выйти
+            </button>
+        </form>
     </div>
 
-    {% if profile %}
-        <div class="item-grid">
-            <article class="item-card">
-                <div class="item-photo-place">
-                    <span>author</span>
+    <div class="profile-layout">
+        <article class="profile-card-large">
+            <div class="profile-photo-block">
+                <span>profile</span>
+            </div>
+
+            <div class="profile-card-content">
+                <p class="profile-meta">{{ request.user.username }}</p>
+
+                <h2>
+                    {% if profile.nickname %}
+                        {{ profile.nickname }}
+                    {% else %}
+                        {{ request.user.username }}
+                    {% endif %}
+                </h2>
+
+                <p class="profile-bio">
+                    {% if profile.bio %}
+                        {{ profile.bio }}
+                    {% else %}
+                        Описание пока не заполнено.
+                    {% endif %}
+                </p>
+
+                <div class="profile-tags">
+                    {% if profile.favorite_style %}
+                        <span>{{ profile.favorite_style }}</span>
+                    {% else %}
+                        <span>стиль не выбран</span>
+                    {% endif %}
                 </div>
+            </div>
+        </article>
 
-                <p class="item-meta">{{ profile.user.username }}</p>
+        <aside class="profile-info-panel">
+            <div class="profile-info-row">
+                <span>Логин</span>
+                <strong>{{ request.user.username }}</strong>
+            </div>
 
-                <h2>{{ profile.nickname }}</h2>
+            <div class="profile-info-row">
+                <span>Email</span>
+                <strong>
+                    {% if request.user.email %}
+                        {{ request.user.email }}
+                    {% else %}
+                        не указан
+                    {% endif %}
+                </strong>
+            </div>
 
-                <p>{{ profile.bio }}</p>
+            <div class="profile-info-row">
+                <span>Телефон</span>
+                <strong>
+                    {% if profile.phone %}
+                        {{ profile.phone }}
+                    {% else %}
+                        не указан
+                    {% endif %}
+                </strong>
+            </div>
 
-                <div class="badges">
-                    <span class="badge badge-gold">{{ profile.favorite_style }}</span>
-                </div>
-            </article>
-        </div>
-    {% else %}
-        <p>Профиль автора пока не создан.</p>
-    {% endif %}
+            <div class="profile-info-row">
+                <span>Любимый стиль</span>
+                <strong>
+                    {% if profile.favorite_style %}
+                        {{ profile.favorite_style }}
+                    {% else %}
+                        не выбран
+                    {% endif %}
+                </strong>
+            </div>
+
+            <a class="profile-edit-link" href="{% url 'accounts:profile_edit' %}">
+                Редактировать профиль
+            </a>
+        </aside>
+    </div>
 </section>
 
 {% endblock %}

@@ -22,14 +22,24 @@ def camera_list(request):
 
 def camera_detail(request, camera_id):
     camera = get_object_or_404(Camera.objects.select_related('brand'), id=camera_id)
-    reviews = camera.reviews.filter(is_visible=True)
+    reviews = camera.reviews.filter(is_visible=True).select_related('author')
 
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'errors': 'Чтобы оставить комментарий, нужно войти в аккаунт.'
+                }, status=403)
+
+            return redirect('accounts:login')
+
         form = CameraReviewForm(request.POST)
 
         if form.is_valid():
             review = form.save(commit=False)
             review.camera = camera
+            review.author = request.user
+            review.author_name = request.user.username
             review.save()
 
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
