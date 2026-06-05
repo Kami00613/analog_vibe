@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
@@ -11,7 +12,9 @@
     </div>
 
     <article class="crud-form-card">
-        <form method="post" class="crud-form">
+        <form method="post"
+              enctype="multipart/form-data"
+              class="crud-form">
             {% csrf_token %}
 
             {% if form.non_field_errors %}
@@ -27,6 +30,35 @@
                     </label>
 
                     {{ field }}
+
+                    {% if field.name == 'image' %}
+                        <div class="single-photo-panel"
+                             id="single-photo-panel"
+                             {% if not camera or not camera.image_path %}hidden{% endif %}>
+                            <p class="single-photo-title">Текущее фото</p>
+
+                            <div class="single-photo-preview-frame">
+                                <img id="single-photo-preview-image"
+                                     {% if camera and camera.image_path %}
+                                         src="{{ camera.image_src }}"
+                                     {% endif %}
+                                     alt="{{ camera.name|default:'Фото камеры' }}">
+
+                                <button type="button"
+                                        class="single-photo-remove"
+                                        id="single-photo-remove"
+                                        aria-label="Убрать выбранное фото">
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <p class="field-help-text">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
 
                     <div class="crud-field-errors">
                         {{ field.errors }}
@@ -47,4 +79,8 @@
     </article>
 </section>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/single_photo_preview.js' %}?v=week8-single-photo-01"></script>
 {% endblock %}

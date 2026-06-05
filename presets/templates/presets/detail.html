@@ -6,20 +6,33 @@
 <section class="catalog-page">
     <div class="catalog-head">
         <h1>{{ preset.title }}</h1>
-        <p>{{ preset.description }}</p>
     </div>
 
     <article class="detail-card" data-owned-card>
-        <div class="item-photo-place">
-            <span>preset detail</span>
+        <div class="single-detail-photo-wrap">
+            {% if preset.image_path %}
+                <div class="single-detail-photo">
+                    <img src="{{ preset.image_src }}" alt="{{ preset.title }}">
+                </div>
+            {% else %}
+                <div class="item-photo-place">
+                    <span>preset detail</span>
+                </div>
+            {% endif %}
         </div>
 
-        <p class="item-meta">
-            {{ preset.tone }} · {{ preset.intensity }}%
-            {% if preset.author %}
-                · автор {{ preset.author.username }}
-            {% endif %}
-        </p>
+        <div class="single-detail-info">
+            <h2 class="single-detail-section-title">Описание</h2>
+
+            <p>{{ preset.description }}</p>
+
+            <p class="item-meta single-detail-meta">
+                {{ preset.tone }} · {{ preset.intensity }}%
+                {% if preset.author %}
+                    · Автор: {{ preset.author.username }}
+                {% endif %}
+            </p>
+        </div>
 
         {% if preset.author == request.user %}
             <div class="card-actions">

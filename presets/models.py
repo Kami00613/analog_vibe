@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
+from django.db import models
 
 
 class Preset(models.Model):
@@ -15,6 +16,12 @@ class Preset(models.Model):
     tone = models.CharField('Тон', max_length=100)
     description = models.TextField('Описание')
     intensity = models.IntegerField('Интенсивность')
+    image_path = models.CharField(
+        'Фото пресета',
+        max_length=500,
+        blank=True,
+        help_text='Путь сохраняется автоматически после загрузки файла.'
+    )
     is_public = models.BooleanField('Открытый', default=True)
 
     class Meta:
@@ -23,6 +30,16 @@ class Preset(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def image_src(self):
+        if not self.image_path:
+            return ''
+
+        if self.image_path.startswith(('http://', 'https://', '/')):
+            return self.image_path
+
+        return default_storage.url(self.image_path)
 
 
 class PresetReview(models.Model):

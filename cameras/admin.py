@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import CameraBrand, Camera, CameraReview
+
+from .models import Camera, CameraBrand, CameraReview
 
 
 class CameraInline(admin.TabularInline):
     model = Camera
     extra = 0
-    fields = ('name', 'year', 'is_working', 'is_rare')
+    fields = ('name', 'year', 'image_path', 'is_working', 'is_rare')
     show_change_link = True
 
 
@@ -30,12 +31,16 @@ class CameraBrandAdmin(admin.ModelAdmin):
 
 @admin.register(Camera)
 class CameraAdmin(admin.ModelAdmin):
-    list_display = ('name', 'brand', 'year', 'is_working', 'is_rare')
+    list_display = ('name', 'brand', 'year', 'has_photo', 'is_working', 'is_rare')
     list_editable = ('year', 'is_working', 'is_rare')
     list_filter = ('brand', 'is_working', 'is_rare', 'year')
     search_fields = ('name', 'description', 'brand__name')
     list_select_related = ('brand',)
     inlines = [CameraReviewInline]
+
+    @admin.display(description='Фото', boolean=True)
+    def has_photo(self, obj):
+        return bool(obj.image_path)
 
 
 @admin.register(CameraReview)

@@ -21,11 +21,17 @@
 
     <div class="item-grid">
         {% for camera in cameras %}
-            <article class="item-card" data-owned-card>
+            <article class="item-card camera-card" data-owned-card>
                 <a href="{% url 'cameras:camera_detail' camera.id %}">
-                    <div class="item-photo-place">
-                        <span>camera</span>
-                    </div>
+                    {% if camera.image_path %}
+                        <div class="item-card-photo">
+                            <img src="{{ camera.image_src }}" alt="{{ camera.name }}">
+                        </div>
+                    {% else %}
+                        <div class="item-photo-place">
+                            <span>camera</span>
+                        </div>
+                    {% endif %}
 
                     <p class="item-meta">
                         {{ camera.brand.name }} · {{ camera.year }}

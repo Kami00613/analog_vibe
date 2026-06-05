@@ -4,19 +4,45 @@
 {% block content %}
 
 <section class="catalog-page">
-    <div class="catalog-head">
+    <div class="catalog-head exhibition-detail-head">
         <h1>{{ exhibition.title }}</h1>
-        <p>{{ exhibition.description }}</p>
     </div>
 
     <article class="detail-card" data-owned-card>
-        <div class="item-photo-place">
-            <span>gallery detail</span>
+        <div class="exhibition-gallery" data-exhibition-gallery>
+            {% for photo in exhibition.photos.all %}
+                <figure class="exhibition-gallery-item">
+                    <button type="button"
+                            class="exhibition-gallery-button"
+                            data-lightbox-open
+                            data-lightbox-index="{{ forloop.counter0 }}"
+                            data-lightbox-src="{{ photo.image_src }}"
+                            data-lightbox-title="{% if photo.caption %}{{ photo.caption }}{% else %}Фото {{ forloop.counter }}{% endif %}">
+                        <img src="{{ photo.image_src }}" alt="{{ photo.caption|default:exhibition.title }}">
+                    </button>
+
+                    <figcaption>
+                        {% if photo.caption %}
+                            {{ photo.caption }}
+                        {% else %}
+                            Фото {{ forloop.counter }}
+                        {% endif %}
+                    </figcaption>
+                </figure>
+            {% empty %}
+                <div class="item-photo-place">
+                    <span>gallery detail</span>
+                </div>
+            {% endfor %}
         </div>
 
-        <p class="item-meta">
+        <div class="exhibition-description-block">
+            <p>{{ exhibition.description }}</p>
+        </div>
+
+        <p class="item-meta exhibition-detail-meta">
             {% if exhibition.curator %}
-                Куратор: {{ exhibition.curator.username }} ·
+                Автор: {{ exhibition.curator.username }} ·
             {% endif %}
             {{ exhibition.photos_count }} фото
         </p>
@@ -119,8 +145,40 @@
     </section>
 </section>
 
+<div class="photo-lightbox" id="photo-lightbox" aria-hidden="true">
+    <div class="photo-lightbox-backdrop" data-lightbox-close></div>
+
+    <div class="photo-lightbox-window">
+        <button type="button"
+                class="photo-lightbox-close"
+                data-lightbox-close
+                aria-label="Закрыть просмотр">
+            ×
+        </button>
+
+        <button type="button"
+                class="photo-lightbox-arrow photo-lightbox-prev"
+                data-lightbox-prev
+                aria-label="Предыдущее фото">
+            ‹
+        </button>
+
+        <img src="" alt="" class="photo-lightbox-image" id="photo-lightbox-image">
+
+        <button type="button"
+                class="photo-lightbox-arrow photo-lightbox-next"
+                data-lightbox-next
+                aria-label="Следующее фото">
+            ›
+        </button>
+
+        <p class="photo-lightbox-caption" id="photo-lightbox-caption"></p>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
 <script src="{% static 'js/comments.js' %}?v=comments-clean-07"></script>
+<script src="{% static 'js/exhibition_lightbox.js' %}?v=week8-lightbox-01"></script>
 {% endblock %}

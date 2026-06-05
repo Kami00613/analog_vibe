@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
+from django.db import models
 
 
 class CameraBrand(models.Model):
@@ -32,6 +33,12 @@ class Camera(models.Model):
     name = models.CharField('Название камеры', max_length=120)
     year = models.IntegerField('Год выпуска')
     description = models.TextField('Описание')
+    image_path = models.CharField(
+        'Фото камеры',
+        max_length=500,
+        blank=True,
+        help_text='Путь сохраняется автоматически после загрузки файла.'
+    )
     is_working = models.BooleanField('Рабочая', default=True)
     is_rare = models.BooleanField('Редкая', default=False)
 
@@ -41,6 +48,16 @@ class Camera(models.Model):
 
     def __str__(self):
         return f'{self.brand.name} {self.name}'
+
+    @property
+    def image_src(self):
+        if not self.image_path:
+            return ''
+
+        if self.image_path.startswith(('http://', 'https://', '/')):
+            return self.image_path
+
+        return default_storage.url(self.image_path)
 
 
 class CameraReview(models.Model):

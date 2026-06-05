@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import PasswordResetForm, UserCreationForm
 from django.contrib.auth.models import User
 
 from .models import Profile
@@ -51,6 +51,34 @@ class CustomRegisterForm(UserCreationForm):
 
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Пользователь с таким email уже существует.')
+
+        return email
+
+
+class ExistingUserPasswordResetForm(PasswordResetForm):
+    """
+    Форма для сброса пароля.
+
+    Стандартная PasswordResetForm из Django специально не говорит,
+    существует пользователь или нет. Для учебного задания делаем явную
+    проверку, чтобы при несуществующей почте пользователь оставался
+    на этой же странице и видел понятную ошибку.
+    """
+
+    email = forms.EmailField(
+        label='Email',
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Введите email',
+            'autocomplete': 'email',
+        })
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip()
+
+        if not User.objects.filter(email__iexact=email, is_active=True).exists():
+            raise forms.ValidationError('Пользователь с такой почтой не найден.')
 
         return email
 

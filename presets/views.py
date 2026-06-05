@@ -18,7 +18,7 @@ def form_errors_as_text(form):
 
 
 def preset_list(request):
-    presets = Preset.objects.select_related('author').all()
+    presets = Preset.objects.select_related('author').order_by('id')
 
     context = {
         'presets': presets,
@@ -47,13 +47,15 @@ def preset_detail(request, preset_id):
 @login_required
 def preset_create(request):
     if request.method == 'POST':
-        form = PresetForm(request.POST)
+        form = PresetForm(request.POST, request.FILES)
 
         if form.is_valid():
             preset = form.save(commit=False)
             preset.author = request.user
             preset.is_public = True
             preset.save()
+
+            form.save_image(preset)
 
             return redirect('presets:preset_detail', preset_id=preset.id)
     else:
@@ -77,12 +79,15 @@ def preset_edit(request, preset_id):
     )
 
     if request.method == 'POST':
-        form = PresetForm(request.POST, instance=preset)
+        form = PresetForm(request.POST, request.FILES, instance=preset)
 
         if form.is_valid():
             preset = form.save(commit=False)
             preset.is_public = True
             preset.save()
+
+            form.save_image(preset)
+
             return redirect('presets:preset_detail', preset_id=preset.id)
     else:
         form = PresetForm(instance=preset)

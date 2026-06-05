@@ -104,4 +104,48 @@
     </a>
 </section>
 
+<section class="recent-exhibitions-home">
+    <div class="home-recent-head">
+        <div>
+            <p>Recent archive</p>
+            <h2>Последние выставки</h2>
+        </div>
+
+        <a href="{% url 'exhibitions:exhibition_list' %}" class="home-recent-link">
+            Все выставки
+        </a>
+    </div>
+
+    {% if recent_exhibitions %}
+        <div class="home-recent-grid">
+            {% for exhibition in recent_exhibitions %}
+                <a href="{% url 'exhibitions:exhibition_detail' exhibition.id %}" class="home-recent-card">
+                    {% with cover=exhibition.cover_photo %}
+                        {% if cover %}
+                            <div class="home-recent-photo">
+                                <img src="{{ cover.image_src }}" alt="{{ exhibition.title }}">
+                            </div>
+                        {% else %}
+                            <div class="item-photo-place">
+                                <span>gallery</span>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <p class="item-meta">{{ exhibition.photos_count }} фото</p>
+                    <h3>{{ exhibition.title }}</h3>
+                    <p>{{ exhibition.description }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="home-recent-empty">
+            <p>
+                Вы пока не открывали выставки. Когда посмотрите несколько подборок,
+                здесь появятся три последние просмотренные выставки.
+            </p>
+        </div>
+    {% endif %}
+</section>
+
 {% endblock %}

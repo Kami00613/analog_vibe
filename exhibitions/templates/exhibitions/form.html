@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
@@ -7,11 +8,15 @@
         <h1>{{ title }}</h1>
         <p>
             Создайте виртуальную выставку для фотоархива AnalogVibe.
+            Можно загрузить от 1 до 25 фотографий.
         </p>
     </div>
 
     <article class="crud-form-card">
-        <form method="post" class="crud-form">
+        <form method="post"
+              enctype="multipart/form-data"
+              class="crud-form"
+              id="exhibition-form">
             {% csrf_token %}
 
             {% if form.non_field_errors %}
@@ -20,13 +25,62 @@
                 </div>
             {% endif %}
 
+            <div id="deleted-photo-inputs"></div>
+
             {% for field in form %}
-                <div class="crud-field">
+                <div class="crud-field {% if field.name == 'images' %}crud-field-files{% endif %}">
                     <label for="{{ field.id_for_label }}">
                         {{ field.label }}
                     </label>
 
                     {{ field }}
+
+                    {% if field.name == 'images' %}
+                        <div class="current-exhibition-photos"
+                             id="exhibition-photos-panel"
+                             {% if not exhibition or not exhibition.photos.exists %}hidden{% endif %}>
+                            <p class="item-meta">
+                                Фотографии выставки
+                                <span id="selected-photos-count">
+                                    {% if exhibition %}
+                                        {{ exhibition.photos_count }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </span>/25
+                            </p>
+
+                            <div class="current-exhibition-photo-grid"
+                                 id="exhibition-photos-grid">
+                                {% if exhibition and exhibition.photos.exists %}
+                                    {% for photo in exhibition.photos.all %}
+                                        <div class="current-exhibition-photo"
+                                             data-existing-photo-card
+                                             data-photo-id="{{ photo.id }}">
+                                            <img src="{{ photo.image_src }}" alt="{{ photo.caption|default:exhibition.title }}">
+
+                                            <button type="button"
+                                                    class="current-photo-remove"
+                                                    data-existing-photo-remove
+                                                    aria-label="Убрать фото">
+                                                ×
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <p class="selected-photos-limit-message"
+                               id="selected-photos-limit-message"
+                               hidden></p>
+                        </div>
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <p class="field-help-text">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
 
                     <div class="crud-field-errors">
                         {{ field.errors }}
@@ -47,4 +101,8 @@
     </article>
 </section>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/exhibition_file_preview.js' %}?v=week8-one-photo-block-01"></script>
 {% endblock %}

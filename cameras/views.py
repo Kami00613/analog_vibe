@@ -2,11 +2,18 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from exhibitions.models import Exhibition
+
 from .forms import CameraForm, CameraReviewForm
 from .models import Camera, CameraReview
+
+
+RECENT_EXHIBITIONS_SESSION_KEY = 'recent_exhibitions'
+HOME_RECENT_EXHIBITIONS_LIMIT = 3
 
 
 def is_ajax(request):
@@ -17,12 +24,79 @@ def form_errors_as_text(form):
     return form.errors.as_text() or 'Проверьте заполнение формы.'
 
 
+def get_recent_exhibitions_for_home(request):
+    recent_ids = request.session.get(RECENT_EXHIBITIONS_SESSION_KEY, [])
+
+    if not recent_ids:
+        return []
+
+    recent_ids = [int(exhibition_id) for exhibition_id in recent_ids]
+    recent_ids = recent_ids[:HOME_RECENT_EXHIBITIONS_LIMIT]
+
+    exhibitions = (
+        Exhibition.objects
+        .select_related('curator')
+        .prefetch_related('photos')
+        .filter(id__in=recent_ids)
+    )
+
+    exhibitions_by_id = {
+        exhibition.id: exhibition
+        for exhibition in exhibitions
+    }
+
+    return [
+        exhibitions_by_id[exhibition_id]
+        for exhibition_id in recent_ids
+        if exhibition_id in exhibitions_by_id
+    ]
+
+
 def home_page(request):
-    return render(request, 'cameras/home.html')
+    recent_exhibitions = get_recent_exhibitions_for_home(request)
+
+    context = {
+        'recent_exhibitions': recent_exhibitions,
+    }
+
+    return render(request, 'cameras/home.html', context)
+
+
+def toggle_theme(request):
+    current_theme = request.COOKIES.get('theme', 'light')
+
+    if current_theme == 'dark':
+        new_theme = 'light'
+    else:
+        new_theme = 'dark'
+
+    next_url = request.META.get('HTTP_REFERER')
+
+    if not next_url or not url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure()
+    ):
+        next_url = reverse('cameras:home')
+
+    response = redirect(next_url)
+
+    response.set_cookie(
+        key='theme',
+        value=new_theme,
+        max_age=60 * 60 * 24 * 365,
+        samesite='Lax'
+    )
+
+    return response
 
 
 def camera_list(request):
-    cameras = Camera.objects.select_related('brand', 'owner').all()
+    cameras = (
+        Camera.objects
+        .select_related('brand', 'owner')
+        .order_by('id')
+    )
 
     context = {
         'cameras': cameras,
@@ -51,12 +125,14 @@ def camera_detail(request, camera_id):
 @login_required
 def camera_create(request):
     if request.method == 'POST':
-        form = CameraForm(request.POST)
+        form = CameraForm(request.POST, request.FILES)
 
         if form.is_valid():
             camera = form.save(commit=False)
             camera.owner = request.user
             camera.save()
+
+            form.save_image(camera)
 
             return redirect('cameras:camera_detail', camera_id=camera.id)
     else:
@@ -80,10 +156,12 @@ def camera_edit(request, camera_id):
     )
 
     if request.method == 'POST':
-        form = CameraForm(request.POST, instance=camera)
+        form = CameraForm(request.POST, request.FILES, instance=camera)
 
         if form.is_valid():
-            form.save()
+            camera = form.save()
+            form.save_image(camera)
+
             return redirect('cameras:camera_detail', camera_id=camera.id)
     else:
         form = CameraForm(instance=camera)

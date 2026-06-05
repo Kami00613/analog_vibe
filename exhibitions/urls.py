@@ -1,10 +1,15 @@
 from django.urls import path
+
 from . import views
+
 
 app_name = 'exhibitions'
 
+
 urlpatterns = [
     path('', views.exhibition_list, name='exhibition_list'),
+    path('recent/', views.recent_exhibitions, name='recent_exhibitions'),
+
     path('create/', views.exhibition_create, name='exhibition_create'),
     path('<int:exhibition_id>/', views.exhibition_detail, name='exhibition_detail'),
     path('<int:exhibition_id>/edit/', views.exhibition_edit, name='exhibition_edit'),

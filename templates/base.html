@@ -5,9 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <title>AnalogVibe</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4156">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=5014">
 </head>
-<body>
+<body class="{% if request.COOKIES.theme == 'dark' %}dark-theme{% else %}light-theme{% endif %}">
 <div class="page">
 
     <header class="topbar">
@@ -22,6 +22,14 @@
             {% else %}
                 <a href="{% url 'accounts:login' %}">Войти</a>
             {% endif %}
+
+            <a href="{% url 'cameras:toggle_theme' %}">
+                {% if request.COOKIES.theme == 'dark' %}
+                    Светлая
+                {% else %}
+                    Тёмная
+                {% endif %}
+            </a>
         </nav>
     </header>
 

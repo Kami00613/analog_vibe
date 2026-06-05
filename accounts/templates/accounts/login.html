@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<section class="auth-page">
+<section class="auth-page auth-page-compact">
     <div class="auth-hero">
         <p class="auth-kicker">Analog photo community</p>
         <h1>Вход</h1>
@@ -12,8 +12,8 @@
         </p>
     </div>
 
-    <article class="auth-card">
-        <div class="auth-card-head">
+    <article class="auth-card auth-card-centered">
+        <div class="auth-card-head auth-card-head-centered">
             <p class="auth-number">login</p>
             <h2>Вход</h2>
             <p>
@@ -38,7 +38,7 @@
                 </div>
             </div>
 
-            <div class="auth-field">
+            <div class="auth-field auth-field-last">
                 <label for="{{ form.password.id_for_label }}">Пароль</label>
                 {{ form.password }}
                 <div class="auth-field-errors">
@@ -46,16 +46,24 @@
                 </div>
             </div>
 
+            <div class="auth-small-link">
+                <a href="{% url 'accounts:password_reset' %}">
+                    Забыли пароль?
+                </a>
+            </div>
+
             <button type="submit" class="auth-button">
                 Войти
             </button>
         </form>
 
-        <div class="auth-bottom">
-            <p>Нет аккаунта?</p>
-            <a href="{% url 'accounts:register' %}">
-                Зарегистрироваться
-            </a>
+        <div class="auth-bottom auth-bottom-centered">
+            <p>
+                Нет аккаунта?
+                <a href="{% url 'accounts:register' %}">
+                    Зарегистрироваться
+                </a>
+            </p>
         </div>
     </article>
 </section>

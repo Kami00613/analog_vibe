@@ -21,13 +21,23 @@
 
     <div class="item-grid">
         {% for exhibition in exhibitions %}
-            <article class="item-card" data-owned-card>
+            <article class="item-card exhibition-card" data-owned-card>
                 <a href="{% url 'exhibitions:exhibition_detail' exhibition.id %}">
-                    <div class="item-photo-place">
-                        <span>gallery</span>
-                    </div>
+                    {% with cover=exhibition.cover_photo %}
+                        {% if cover %}
+                            <div class="exhibition-card-photo">
+                                <img src="{{ cover.image_src }}" alt="{{ exhibition.title }}">
+                            </div>
+                        {% else %}
+                            <div class="item-photo-place">
+                                <span>gallery</span>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
 
-                    <p class="item-meta">{{ exhibition.photos_count }} фото</p>
+                    <p class="item-meta">
+                        {{ exhibition.photos_count }} фото
+                    </p>
 
                     <h2>{{ exhibition.title }}</h2>
 

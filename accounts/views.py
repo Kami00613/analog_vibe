@@ -1,9 +1,11 @@
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
+from django.views.decorators.http import require_POST
 
 from .forms import CustomRegisterForm, ProfileForm
 from .models import Profile
@@ -51,6 +53,39 @@ def register(request):
     }
 
     return render(request, 'accounts/register.html', context)
+
+
+@require_POST
+def check_password_reset_email(request):
+    """
+    AJAX-проверка email перед сбросом пароля.
+
+    Если пользователь ввел email, которого нет в базе,
+    страница не перезагружается — JS просто показывает ошибку под полем.
+    """
+    email = request.POST.get('email', '').strip()
+
+    if not email:
+        return JsonResponse({
+            'exists': False,
+            'message': 'Введите email.'
+        }, status=400)
+
+    user_exists = User.objects.filter(
+        email__iexact=email,
+        is_active=True
+    ).exists()
+
+    if not user_exists:
+        return JsonResponse({
+            'exists': False,
+            'message': 'Пользователь с такой почтой не найден.'
+        }, status=404)
+
+    return JsonResponse({
+        'exists': True,
+        'message': ''
+    })
 
 
 @login_required

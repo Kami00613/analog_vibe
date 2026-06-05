@@ -1,10 +1,15 @@
 from django.urls import path
+
 from . import views
+
 
 app_name = 'cameras'
 
+
 urlpatterns = [
     path('', views.home_page, name='home'),
+    path('toggle-theme/', views.toggle_theme, name='toggle_theme'),
+
     path('cameras/', views.camera_list, name='camera_list'),
     path('cameras/create/', views.camera_create, name='camera_create'),
     path('cameras/<int:camera_id>/', views.camera_detail, name='camera_detail'),

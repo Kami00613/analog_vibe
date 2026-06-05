@@ -21,11 +21,17 @@
 
     <div class="item-grid">
         {% for preset in presets %}
-            <article class="item-card" data-owned-card>
+            <article class="item-card preset-card" data-owned-card>
                 <a href="{% url 'presets:preset_detail' preset.id %}">
-                    <div class="item-photo-place">
-                        <span>preset</span>
-                    </div>
+                    {% if preset.image_path %}
+                        <div class="item-card-photo">
+                            <img src="{{ preset.image_src }}" alt="{{ preset.title }}">
+                        </div>
+                    {% else %}
+                        <div class="item-photo-place">
+                            <span>preset</span>
+                        </div>
+                    {% endif %}
 
                     <p class="item-meta">{{ preset.tone }} · {{ preset.intensity }}%</p>
 

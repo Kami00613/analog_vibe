@@ -9,6 +9,10 @@ from .forms import ExhibitionForm, ExhibitionReviewForm
 from .models import Exhibition, ExhibitionReview
 
 
+RECENT_EXHIBITIONS_SESSION_KEY = 'recent_exhibitions'
+RECENT_EXHIBITIONS_LIMIT = 5
+
+
 def is_ajax(request):
     return request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
@@ -17,8 +21,58 @@ def form_errors_as_text(form):
     return form.errors.as_text() or 'Проверьте заполнение формы.'
 
 
+def add_exhibition_to_recent_session(request, exhibition_id):
+    recent_ids = request.session.get(RECENT_EXHIBITIONS_SESSION_KEY, [])
+
+    exhibition_id = int(exhibition_id)
+
+    recent_ids = [
+        int(saved_id)
+        for saved_id in recent_ids
+        if int(saved_id) != exhibition_id
+    ]
+
+    recent_ids.insert(0, exhibition_id)
+    recent_ids = recent_ids[:RECENT_EXHIBITIONS_LIMIT]
+
+    request.session[RECENT_EXHIBITIONS_SESSION_KEY] = recent_ids
+    request.session.modified = True
+
+
+def get_recent_exhibitions_from_session(request):
+    recent_ids = request.session.get(RECENT_EXHIBITIONS_SESSION_KEY, [])
+
+    if not recent_ids:
+        return []
+
+    exhibitions = (
+        Exhibition.objects
+        .select_related('curator')
+        .prefetch_related('photos')
+        .filter(id__in=recent_ids)
+    )
+
+    exhibitions_by_id = {
+        exhibition.id: exhibition
+        for exhibition in exhibitions
+    }
+
+    recent_exhibitions = [
+        exhibitions_by_id[exhibition_id]
+        for exhibition_id in recent_ids
+        if exhibition_id in exhibitions_by_id
+    ]
+
+    return recent_exhibitions
+
+
 def exhibition_list(request):
-    exhibitions = Exhibition.objects.select_related('curator').all()
+    exhibitions = (
+        Exhibition.objects
+        .select_related('curator')
+        .prefetch_related('photos')
+        .order_by('id')
+    )
 
     context = {
         'exhibitions': exhibitions,
@@ -27,11 +81,25 @@ def exhibition_list(request):
     return render(request, 'exhibitions/list.html', context)
 
 
+def recent_exhibitions(request):
+    exhibitions = get_recent_exhibitions_from_session(request)
+
+    context = {
+        'exhibitions': exhibitions,
+    }
+
+    return render(request, 'exhibitions/recent.html', context)
+
+
 def exhibition_detail(request, exhibition_id):
     exhibition = get_object_or_404(
-        Exhibition.objects.select_related('curator'),
+        Exhibition.objects
+        .select_related('curator')
+        .prefetch_related('photos'),
         id=exhibition_id
     )
+
+    add_exhibition_to_recent_session(request, exhibition.id)
 
     reviews = exhibition.reviews.filter(is_visible=True).select_related('author')
     form = ExhibitionReviewForm()
@@ -48,13 +116,15 @@ def exhibition_detail(request, exhibition_id):
 @login_required
 def exhibition_create(request):
     if request.method == 'POST':
-        form = ExhibitionForm(request.POST)
+        form = ExhibitionForm(request.POST, request.FILES)
 
         if form.is_valid():
             exhibition = form.save(commit=False)
             exhibition.curator = request.user
             exhibition.is_published = True
             exhibition.save()
+
+            form.save_photos(exhibition)
 
             return redirect('exhibitions:exhibition_detail', exhibition_id=exhibition.id)
     else:
@@ -72,18 +142,20 @@ def exhibition_create(request):
 @login_required
 def exhibition_edit(request, exhibition_id):
     exhibition = get_object_or_404(
-        Exhibition,
+        Exhibition.objects.prefetch_related('photos'),
         id=exhibition_id,
         curator=request.user
     )
 
     if request.method == 'POST':
-        form = ExhibitionForm(request.POST, instance=exhibition)
+        form = ExhibitionForm(request.POST, request.FILES, instance=exhibition)
 
         if form.is_valid():
             exhibition = form.save(commit=False)
             exhibition.is_published = True
             exhibition.save()
+
+            form.save_photos(exhibition)
 
             return redirect('exhibitions:exhibition_detail', exhibition_id=exhibition.id)
     else:

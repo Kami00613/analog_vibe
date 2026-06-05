@@ -6,31 +6,44 @@
 <section class="catalog-page">
     <div class="catalog-head">
         <h1>{{ camera.name }}</h1>
-        <p>{{ camera.description }}</p>
     </div>
 
     <article class="detail-card" data-owned-card>
-        <div class="item-photo-place">
-            <span>camera detail</span>
+        <div class="single-detail-photo-wrap">
+            {% if camera.image_path %}
+                <div class="single-detail-photo">
+                    <img src="{{ camera.image_src }}" alt="{{ camera.name }}">
+                </div>
+            {% else %}
+                <div class="item-photo-place">
+                    <span>camera detail</span>
+                </div>
+            {% endif %}
         </div>
 
-        <p class="item-meta">
-            {{ camera.brand.name }} · {{ camera.year }}
-            {% if camera.owner %}
-                · добавил {{ camera.owner.username }}
-            {% endif %}
-        </p>
+        <div class="single-detail-info">
+            <h2 class="single-detail-section-title">Описание</h2>
 
-        <div class="badges">
-            {% if camera.is_working %}
-                <span class="badge badge-green">Рабочая</span>
-            {% else %}
-                <span class="badge badge-red">Ремонт</span>
-            {% endif %}
+            <p>{{ camera.description }}</p>
 
-            {% if camera.is_rare %}
-                <span class="badge badge-gold">Редкая</span>
-            {% endif %}
+            <p class="item-meta single-detail-meta">
+                {{ camera.brand.name }} · {{ camera.year }}
+                {% if camera.owner %}
+                    · Автор: {{ camera.owner.username }}
+                {% endif %}
+            </p>
+
+            <div class="badges">
+                {% if camera.is_working %}
+                    <span class="badge badge-green">Рабочая</span>
+                {% else %}
+                    <span class="badge badge-red">Ремонт</span>
+                {% endif %}
+
+                {% if camera.is_rare %}
+                    <span class="badge badge-gold">Редкая</span>
+                {% endif %}
+            </div>
         </div>
 
         {% if camera.owner == request.user %}
