@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'presets.apps.PresetsConfig',
     'exhibitions.apps.ExhibitionsConfig',
 
+    'rest_framework',
+    'drf_spectacular',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -153,3 +156,14 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'AnalogVibe API',
+    'DESCRIPTION': 'API для камер, пленочных пресетов, виртуальных выставок и профилей пользователей AnalogVibe.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
