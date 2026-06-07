@@ -2845,3 +2845,64 @@ body.dark-theme .selected-photos-limit-message {
     color: #f6dfb8;
 }
 
+.oauth-divider {
+    margin: 22px 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: #6f5139;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.oauth-divider::before,
+.oauth-divider::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: rgba(31, 23, 18, 0.28);
+}
+
+.github-login-button {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 18px;
+    background: #1d1510;
+    border: 2px solid #1d1510;
+    color: #fff3d7;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.github-login-button:hover {
+    background: #6f5139;
+    border-color: #6f5139;
+    color: #fff3d7;
+}
+
+body.dark-theme .oauth-divider {
+    color: #d8b684;
+}
+
+body.dark-theme .oauth-divider::before,
+body.dark-theme .oauth-divider::after {
+    background: rgba(246, 223, 184, 0.28);
+}
+
+body.dark-theme .github-login-button {
+    background: #f6dfb8;
+    border-color: #f6dfb8;
+    color: #1d1510;
+}
+
+body.dark-theme .github-login-button:hover {
+    background: #d8b684;
+    border-color: #d8b684;
+}

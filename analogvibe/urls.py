@@ -12,7 +12,12 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+
+    path('api/auth/', include('dj_rest_auth.urls')),
+    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/', include('analogvibe.api_urls')),
+
+    path('accounts/', include('allauth.urls')),
 
     path('', include('cameras.urls')),
     path('', include('accounts.urls')),
